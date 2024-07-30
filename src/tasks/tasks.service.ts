@@ -1,81 +1,89 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common'
 
-import { Prisma, Tasks } from '@prisma/client';
-import { PrismaService } from '../prisma.service';
+import { Prisma, Tasks } from '@prisma/client'
+import { PrismaService } from '../prisma.service'
 
 @Injectable()
 export class TasksService {
-  constructor(private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService) {}
 
-  async getTask(
-    taskWhereUniqueInput: Prisma.TasksWhereUniqueInput,
-  ): Promise<Tasks | null> {
-    return this.prisma.tasks.findUnique({
-      where: taskWhereUniqueInput,
-    });
-  }
+    async getTask(
+        taskWhereUniqueInput: Prisma.TasksWhereUniqueInput
+    ): Promise<Tasks | null> {
+        return this.prisma.tasks.findUnique({
+            where: taskWhereUniqueInput,
+        })
+    }
 
-  async getAllTasks(): Promise<Tasks[]> {
-    return this.prisma.tasks.findMany();
-  }
+    async getAllTasks(): Promise<Tasks[]> {
+        return this.prisma.tasks.findMany()
+    }
 
-  async getManyTasks(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.TasksWhereUniqueInput;
-    where?: Prisma.TasksWhereInput;
-    orderBy?: Prisma.TasksOrderByWithRelationInput;
-  }): Promise<Tasks[]> {
-    const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.tasks.findMany({
-      skip,
-      take,
-      cursor,
-      where,
-      orderBy,
-    });
-  }
+    async getFilteredTasks(query: {
+        title?: string
+        c?: string // completed = true
+        p?: string // completed = false
+        id?: string
+    }): Promise<Tasks[]> {
+        const { title, c, p, id } = query
+        const titleFilter = title ? { title: { contains: title } } : {}
+        let completedFilter = {}
 
-  async createTask(data: Prisma.TasksCreateInput): Promise<Tasks> {
-    return this.prisma.tasks.create({
-      data,
-    });
-  }
+        if (c !== undefined) {
+            completedFilter = { completed: true }
+        } else if (p !== undefined) {
+            completedFilter = { completed: false }
+        }
 
-  async updateTask(params: {
-    where: Prisma.TasksWhereUniqueInput;
-    data: Prisma.TasksUpdateInput;
-  }): Promise<Tasks> {
-    const { where, data } = params;
-    return this.prisma.tasks.update({
-      where,
-      data,
-    });
-  }
+        const idFilter = id ? { id: Number(id) } : {}
 
-  async deleteTask(where: Prisma.TasksWhereUniqueInput): Promise<Tasks> {
-    return this.prisma.tasks.delete({
-      where,
-    });
-  }
+        return this.prisma.tasks.findMany({
+            where: {
+                AND: [titleFilter, idFilter, completedFilter],
+            },
+        })
+    }
 
-  // create(createTaskDto: CreateTaskDto) {
-  //   return 'This action adds a new task';
-  // }
+    async createTask(data: Prisma.TasksCreateInput): Promise<Tasks> {
+        return this.prisma.tasks.create({
+            data,
+        })
+    }
 
-  // findAll() {
-  //   return `This action returns all tasks`;
-  // }
+    async updateTask(params: {
+        where: Prisma.TasksWhereUniqueInput
+        data: Prisma.TasksUpdateInput
+    }): Promise<Tasks> {
+        const { where, data } = params
+        return this.prisma.tasks.update({
+            where,
+            data,
+        })
+    }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} task`;
-  // }
+    async deleteTask(where: Prisma.TasksWhereUniqueInput): Promise<Tasks> {
+        return this.prisma.tasks.delete({
+            where,
+        })
+    }
 
-  // update(id: number, updateTaskDto: UpdateTaskDto) {
-  //   return `This action updates a #${id} task`;
-  // }
+    // create(createTaskDto: CreateTaskDto) {
+    //   return 'This action adds a new task';
+    // }
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} task`;
-  // }
+    // findAll() {
+    //   return `This action returns all tasks`;
+    // }
+
+    // findOne(id: number) {
+    //   return `This action returns a #${id} task`;
+    // }
+
+    // update(id: number, updateTaskDto: UpdateTaskDto) {
+    //   return `This action updates a #${id} task`;
+    // }
+
+    // remove(id: number) {
+    //   return `This action removes a #${id} task`;
+    // }
 }
