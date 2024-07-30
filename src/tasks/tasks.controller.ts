@@ -1,12 +1,13 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpCode,
+    Param,
+    Post,
+    Put,
+    Query,
 } from '@nestjs/common'
 import { Tasks as TasksModel } from '@prisma/client'
 import { TasksService } from './tasks.service'
@@ -31,29 +32,28 @@ export class TasksController {
     }
 
     @Post('tasks')
-    async createTask(
-        @Body() postData: { title: string; description: string }
-    ): Promise<TasksModel> {
-        const { title, description } = postData
-        return this.tasksService.createTask({ title, description })
+    async createTask(@Body() postData: { title: string }): Promise<TasksModel> {
+        const { title } = postData
+        return this.tasksService.createTask({ title })
     }
 
     @Put('tasks/:id')
     async updateTask(
         @Param('id') id: string,
         @Body()
-        postData: { title: string; description: string; completed: boolean }
+        postData: { title: string; completed: boolean }
     ): Promise<TasksModel> {
-        const { title, description, completed } = postData
+        const { title, completed } = postData
         return this.tasksService.updateTask({
             where: { id: Number(id) },
-            data: { title, description, completed },
+            data: { title, completed },
         })
     }
 
     @Delete('tasks/:id')
-    async deleteTask(@Param('id') id: string): Promise<TasksModel> {
-        return this.tasksService.deleteTask({ id: Number(id) })
+    @HttpCode(204)
+    async deleteTask(@Param('id') id: string) {
+        this.tasksService.deleteTask({ id: Number(id) })
     }
 
     // @Post()
