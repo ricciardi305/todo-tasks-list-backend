@@ -15,6 +15,10 @@ export class TasksService {
     });
   }
 
+  async getAllTasks(): Promise<Tasks[]> {
+    return this.prisma.tasks.findMany();
+  }
+
   async getManyTasks(params: {
     skip?: number;
     take?: number;

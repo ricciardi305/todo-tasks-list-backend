@@ -19,6 +19,11 @@ export class TasksController {
     return this.tasksService.getTask({ id: Number(id) });
   }
 
+  @Get()
+  async getAllTasks(): Promise<TasksModel[]> {
+    return this.tasksService.getAllTasks();
+  }
+
   @Get(':paramsString')
   async getManyTasks(
     @Param('paramsString') paramsString: string,
