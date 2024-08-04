@@ -20,6 +20,11 @@ export class UsersController {
         return this.usersService.createUser(data)
     }
 
+    @Get('users')
+    async getAllUsers(): Promise<RetrieveUserDto[]> {
+        return this.usersService.getAllUsers()
+    }
+
     @Get('users/:id')
     async findUser(@Param('id') id: string): Promise<RetrieveUserDto> {
         return this.usersService.findUser(id)

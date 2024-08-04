@@ -22,15 +22,20 @@ export class ListsController {
 
     @Get('lists/:id')
     async getListById(@Param('id') id: string): Promise<ListsModel> {
-        return this.listsService.findListById({ id: Number(id) })
+        return this.listsService.findListById(id)
     }
 
     @Post('lists')
     async createList(
-        @Body() postData: { title: string; description?: string }
+        @Body()
+        postData: {
+            title: string
+            description?: string
+            userId: number
+        }
     ): Promise<ListsModel> {
-        const { title, description } = postData
-        return this.listsService.createList({ title, description })
+        const { title, description, userId } = postData
+        return this.listsService.createList({ title, description, userId })
     }
 
     @Put('lists/:id')

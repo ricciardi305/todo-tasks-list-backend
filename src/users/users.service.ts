@@ -18,10 +18,28 @@ export class UsersService {
             data: {
                 ...data,
                 password: hash,
+                lists: {
+                    create: {
+                        title: 'Minha lista de tarefas',
+                    },
+                },
             },
         })
 
         return this.findUser(String(createdUser.id))
+    }
+
+    async getAllUsers(): Promise<RetrieveUserDto[]> {
+        return this.prisma.users.findMany({
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                createdAt: true,
+                lists: true,
+                tasks: true,
+            },
+        })
     }
 
     async findUser(id: string): Promise<RetrieveUserDto> {

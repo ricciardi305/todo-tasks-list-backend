@@ -1,32 +1,67 @@
 import { Injectable } from '@nestjs/common'
 import { Lists, Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma.service'
+import { CreateListDto } from './dtos/create-list.dto'
 
 @Injectable()
 export class ListsService {
     constructor(private prisma: PrismaService) {}
 
-    async createList(data: Prisma.ListsCreateInput): Promise<Lists> {
-        return this.prisma.lists.create({ data })
+    async createList(data: CreateListDto): Promise<Lists> {
+        const newList = await this.prisma.lists.create({
+            data: {
+                title: data.title,
+                description: data.description,
+                Users: {
+                    connect: {
+                        id: data.userId,
+                    },
+                },
+            },
+        })
+
+        return this.findListById(String(newList.id))
     }
 
     async findAllLists(): Promise<Lists[]> {
         return this.prisma.lists.findMany({
             include: {
                 tasks: true,
-                _count: true,
+                Users: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        tasks: true,
+                    },
+                },
             },
         })
     }
 
-    async findListById(
-        listWhereUniqueInput: Prisma.ListsWhereUniqueInput
-    ): Promise<Lists> {
+    async findListById(id: string): Promise<Lists> {
         return this.prisma.lists.findUnique({
-            where: listWhereUniqueInput,
+            where: {
+                id: Number(id),
+            },
             include: {
                 tasks: true,
-                _count: true,
+                Users: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        tasks: true,
+                    },
+                },
             },
         })
     }

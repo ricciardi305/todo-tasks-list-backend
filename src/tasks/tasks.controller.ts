@@ -18,7 +18,7 @@ export class TasksController {
 
     @Get('tasks/:id')
     async getTaskById(@Param('id') id: string): Promise<TasksModel> {
-        return this.tasksService.getTask({ id: Number(id) })
+        return this.tasksService.getTask(id)
     }
 
     @Get('tasks')
@@ -32,9 +32,11 @@ export class TasksController {
     }
 
     @Post('tasks')
-    async createTask(@Body() postData: { title: string }): Promise<TasksModel> {
-        const { title } = postData
-        return this.tasksService.createTask({ title })
+    async createTask(
+        @Body() postData: { title: string; userId: number; listId?: number }
+    ): Promise<TasksModel> {
+        const { title, userId, listId } = postData
+        return this.tasksService.createTask({ title, userId, listId })
     }
 
     @Put('tasks/:id')
